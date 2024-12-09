@@ -1,35 +1,87 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState, ComponentProps } from 'react'
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+type TUserInformation = {
+  firstName: string;
+  lastName: string;
+}
+export function UserInfo({userInformation} : {userInformation: TUserInformation | null}){
+  const firstName = userInformation?.firstName
+  const lastName = userInformation?.lastName
+  return <div>
+    <div>First Name: {firstName}</div>
+    <div>Last Name: {lastName}</div>
+  </div>
+}
 
+
+
+type InputProps = ComponentProps<"input">
+
+
+const TextInput = ({inputProps, label}: { inputProps: InputProps, label: string }) => {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div>
+      <label>{label}: </label>
+      <input
+        type="text"
+        {...inputProps} />
+    </div>
   )
 }
+
+const UserInfoForm = ({handleUserInformation}: {
+  handleUserInformation: (userInformation: TUserInformation) => void
+}) => {
+  const [firstNameInput, setFirstNameInput] = useState("")
+  const [lastNameInput, setLastNameInput] = useState("")
+
+  return (
+    <form onSubmit={(e) => {
+      e.preventDefault()
+      handleUserInformation({
+        firstName: firstNameInput,
+        lastName: lastNameInput
+      })
+      setFirstNameInput('')
+      setLastNameInput('')
+    }}>
+      <TextInput
+        label={"First Name"}
+        inputProps={{
+          onChange: (e) => {
+            setFirstNameInput(e.target.value)
+          },
+          value: firstNameInput
+        }}
+      />
+      <TextInput
+        label={"Last Name"}
+        inputProps={{
+          onChange: (e) => {
+            setLastNameInput(e.target.value)
+          },
+          value: lastNameInput
+        }}
+      />
+      <input type="submit" />
+    </form>
+  )
+}
+
+
+function App() {
+  const [userInformation, setUserInformation] = useState<TUserInformation | null>(null)
+  return (
+    <div className="App">
+      <UserInfo userInformation={userInformation} />
+      <UserInfoForm handleUserInformation={(userInformation) => {
+
+        setUserInformation(userInformation)
+      }}/>
+    </div>
+  )
+}
+
 
 export default App
